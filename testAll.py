@@ -77,7 +77,7 @@ class TestStudent(unittest.TestCase):
         self.assertAlmostEqual(self.s.calcGPA(), round(24.0 / 7, 2), places=2)
 
     def testCalcGPANoCourses(self):
-        """Test that calcGPA returns 0.0 with no courses, no division-by-zero SM"""
+        """Test that calcGPA returns 0.0 with no courses, no division by zero SM"""
         self.assertEqual(self.s.calcGPA(), 0.0)
 
     def testGetCourses(self):
