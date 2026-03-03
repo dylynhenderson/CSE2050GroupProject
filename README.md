@@ -1,3 +1,5 @@
+# CSE2050 — Group Project Milestone 1
+
 ## How to Run
 
 **Run demonstrations:**
