@@ -9,40 +9,40 @@ class University:
         self.courses = {}
             
     def addCourse(self, code, creds):
-        """Add a course to the university DH"""
+        '''Add a course to the university DH'''
         if code not in self.courses:
             self.courses[code] = Course(code, creds)
         return self.courses[code]
         
-    def addStudent(self, name, id):
-        """Add a student to the university DH"""
-        if len(id) != 8:
-            raise ValueError(f"Invalid ID: {id}")
-        if not id.startswith('STU'):
-            raise ValueError(f"Invalid ID: {id}")
+    def addStudent(self, student_id, name):
+        '''Add a student to the university DH'''
+        if len(student_id) != 8:
+            raise ValueError(f"Invalid ID: {student_id}")
+        if not student_id.startswith('STU'):
+            raise ValueError(f"Invalid ID: {student_id}")
         if name == "":
             raise ValueError("Name cannot be empty.")
-        if id not in self.students:
-            self.students[id] = Student(name, id)
-        return self.students[id]
+        if student_id not in self.students:
+            self.students[student_id] = Student(name, student_id)
+        return self.students[student_id]
         
     def getStudent(self, id):
-        """Return a student object given their ID DH"""
+        '''Return a student object given their ID DH'''
         return self.students.get(id, None)
     
     def getCourse(self, code):
-        """Return a course object given its code DH"""
+        '''Return a course object given its code DH'''
         return self.courses.get(code, None)
     
     def getCourseEnrollment(self, code):
-        """Return the number of students enrolled in a course SM"""
+        '''Return the number of students enrolled in a course SM'''
         course = self.getCourse(code)
         if course:
             return course.getStudentCount()
         return 0
     
     def getStudentsInCourse(self, code):
-        """Return a list of student IDs enrolled in a course SM"""
+        '''Return a list of student IDs enrolled in a course SM'''
         course = self.getCourse(code)
         if course:
             return list(course.students)
@@ -102,7 +102,7 @@ def loadUniversity(dataCsv, catalogCsv):
         name = row['name']
 
         try:
-            student = uni.addStudent(name, id)
+            student = uni.addStudent(id, name)
         except ValueError as e:
             print(f"[SKIP] {e}")
             continue

@@ -1,5 +1,5 @@
 class Student():
-    """Object representing a student. SM"""
+    '''Object representing a student. SM'''
     _grade_points = {
             'A': 4.0,
             'A-': 3.7,
@@ -16,7 +16,7 @@ class Student():
     
     
     def __init__(self, name, id, Courses=None):
-        """Initialize a student with name, id, and all currently enrolled courses SM"""
+        '''Initialize a student with name, id, and all currently enrolled courses SM'''
         self.name = name
         self.id = id
         if Courses is not None:
@@ -25,21 +25,21 @@ class Student():
             self.courses = {}
         
     def enroll(self,course,grade):
-        """Enroll the student in a new course with a grade and update list of students SM and DH"""
+        '''Enroll the student in a new course with a grade and update list of students SM and DH'''
         if grade not in self._grade_points:
             raise ValueError(f"Invalid grade: {grade}")
         self.courses[course] = grade
         course.addStudent(self)
         
     def updateGrade(self, course, grade):
-        """If a student is already enrolled in a course, update their grade SM"""
+        '''If a student is already enrolled in a course, update their grade SM'''
         if grade not in self._grade_points:
             raise ValueError(f"Invalid grade: {grade}")
         if course in self.courses:
             self.courses[course] = grade
             
     def calcGPA(self):
-        """Calculate the students gpa SM"""
+        '''Calculate the students gpa SM'''
         totalPoints = 0.0
         totalCreds = 0
         for course, grade in self.courses.items():
@@ -51,7 +51,7 @@ class Student():
             return 0.0
         
     def getCourses(self):
-        """Return a list of courses the student is enrolled in DH"""
+        '''Return a list of courses the student is enrolled in DH'''
         return list(self.courses.keys())
     
     def getCourseInfo(self):
@@ -59,6 +59,6 @@ class Student():
         return [(c.courseCode, self.courses[c], c.cred) for c in self.courses]
         
     def printCourses(self):
-        """Testing method to print all courses and grades SM"""
+        '''Testing method to print all courses and grades SM'''
         for course, grade in self.courses.items():
             print(f"Course: {course.name}, Grade: {grade}")
