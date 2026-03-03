@@ -62,6 +62,13 @@ class University:
             return round(sum(gpas) / len(gpas), 2)
         else:
             return 0.0
+
+    def modeGPA(self):
+        '''Calculate and return the mode GPA of all students in the university DH'''
+        gpas = self.getAllGPAs()
+        if not gpas:
+            return 0.0
+        return max(set(gpas), key=gpas.count)
         
     def medianGPA(self):
         '''Calculate and return the median GPA of all students in the university DH'''

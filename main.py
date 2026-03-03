@@ -1,6 +1,7 @@
 from university import loadUniversity
 
 def main():
+    '''Main function to demonstrate university data loading and functionality DH'''
     print("Loading university data...")
     uni = loadUniversity("university_data.csv", "course_catalog.csv")
     print(f"  Loaded {len(uni.students)} students and {len(uni.courses)} courses.\n")
@@ -24,6 +25,7 @@ def main():
 
     print(f"\nUniversity GPA Stats")
     print(f"  Mean GPA:   {uni.meanGPA()}")
+    print(f"  Mode GPA:   {uni.modeGPA()}")
     print(f"  Median GPA: {uni.medianGPA()}")
 
     print(f"\nStudents in both {sampleCode1} and {sampleCode2}")

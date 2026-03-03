@@ -69,6 +69,7 @@ class TestStudent(unittest.TestCase):
         self.s.enroll(self.c1, "B")
         self.s.updateGrade(self.c1, "A")
         self.assertEqual(self.s.courses[self.c1], "A")
+        self.assertRaises(ValueError, self.s.updateGrade, self.c1, "E")
 
     def testCalcGPAWeighted(self):
         '''Test that GPA is correctly weighted by credits SM'''

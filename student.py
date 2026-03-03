@@ -15,12 +15,12 @@ class Student():
         }
     
     
-    def __init__(self, name, id, Courses=None):
+    def __init__(self, name, id, courses=None):
         '''Initialize a student with name, id, and all currently enrolled courses SM'''
         self.name = name
         self.id = id
-        if Courses is not None:
-            self.courses = Courses
+        if courses is not None:
+            self.courses = courses
         else:
             self.courses = {}
         
@@ -37,6 +37,8 @@ class Student():
             raise ValueError(f"Invalid grade: {grade}")
         if course in self.courses:
             self.courses[course] = grade
+        else:
+            raise ValueError(f"Student not enrolled in course: {course.courseCode}")
             
     def calcGPA(self):
         '''Calculate the students gpa SM'''
