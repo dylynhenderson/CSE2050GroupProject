@@ -1,26 +1,30 @@
-from groupProject.course import Course
-from groupProject.student import Student
+from course import Course
+from student import Student
 import csv
-
 
 class University:
     '''Create University object DH'''
-    def __init__(self, stuL, corL):
+    def __init__(self):
         self.students = {}
         self.courses = {}
-        for i in stuL:
-            self.students[i.id] = i
-        for i in corL:
-            self.courses[i.courseCode] = i
-
             
-    def addCourse(self,code,creds):
+    def addCourse(self, code, creds):
         """Add a course to the university DH"""
-        self.courses[code] = Course(code, creds, [])
+        if code not in self.courses:
+            self.courses[code] = Course(code, creds)
+        return self.courses[code]
         
-    def addStudent(self,name,id):
+    def addStudent(self, name, id):
         """Add a student to the university DH"""
-        self.students[id] = Student(name, id, {})
+        if len(id) != 8:
+            raise ValueError(f"Invalid ID: {id}")
+        if not id.startswith('STU'):
+            raise ValueError(f"Invalid ID: {id}")
+        if name == "":
+            raise ValueError("Name cannot be empty.")
+        if id not in self.students:
+            self.students[id] = Student(name, id)
+        return self.students[id]
         
     def getStudent(self, id):
         """Return a student object given their ID DH"""
@@ -30,7 +34,7 @@ class University:
         """Return a course object given its code DH"""
         return self.courses.get(code, None)
     
-    def getCourseEnrollment(self,code):
+    def getCourseEnrollment(self, code):
         """Return the number of students enrolled in a course SM"""
         course = self.getCourse(code)
         if course:
@@ -41,6 +45,87 @@ class University:
         """Return a list of student IDs enrolled in a course SM"""
         course = self.getCourse(code)
         if course:
-            return list(course.students.keys())
+            return list(course.students)
         return []
+    
+    def getAllGPAs(self):
+        '''Return a list of all student GPAs in the university DH'''
+        gpas = []
+        for s in self.students.values():
+            gpas.append(s.calcGPA())
+        return gpas
+    
+    def meanGPA(self):
+        ''''Calculate and return the mean GPA of all students in the university DH'''
+        gpas = self.getAllGPAs()
+        if gpas:
+            return round(sum(gpas) / len(gpas), 2)
+        else:
+            return 0.0
         
+    def medianGPA(self):
+        '''Calculate and return the median GPA of all students in the university DH'''
+        gpas = sorted(self.getAllGPAs())
+        n = len(gpas)
+        if n == 0:
+            return 0.0
+        mid = n // 2
+        if n % 2 == 0:
+            return round((gpas[mid - 1] + gpas[mid]) / 2, 2)
+        else:
+            return gpas[mid]
+        
+    def getCommonStudents(self, code1, code2):
+        '''Return a list of student IDs enrolled in both courses DH'''
+        s1 = set(s.id for s in self.getStudentsInCourse(code1))
+        s2 = set(s.id for s in self.getStudentsInCourse(code2))
+        return [self.students[id] for id in s1 & s2]
+    
+def loadUniversity(dataCsv, catalogCsv):
+    '''Read CSV files and return a fully populated University object DH'''
+    uni = University()
+
+    # Load courses from course_catalog.csv
+    catalogFile = open(catalogCsv)
+    catalog = csv.DictReader(catalogFile)
+    for row in catalog:
+        code    = row['course_code']
+        credits = int(row['credits'])
+        uni.addCourse(code, credits)
+    catalogFile.close()
+
+    # Load students from university_data.csv
+    dataFile = open(dataCsv)
+    data = csv.DictReader(dataFile)
+    for row in data:
+        id   = row['student_id']
+        name = row['name']
+
+        try:
+            student = uni.addStudent(name, id)
+        except ValueError as e:
+            print(f"[SKIP] {e}")
+            continue
+
+        # courses field looks like: "CSE1010:A;MATH2010:B+;CSE2050:C"
+        # split by ; to get each course entry
+        coursesList = row['courses'].strip(';').split(';')
+
+        for entry in coursesList:
+            # entry looks like "CSE1010:A"
+            # split by : to get code and grade
+            parts = entry.split(':')
+            code  = parts[0]
+            grade = parts[1]
+
+            course = uni.getCourse(code)
+            if course is None:
+                course = uni.addCourse(code, 0)
+
+            try:
+                student.enroll(course, grade)
+            except ValueError as e:
+                print(f"[SKIP] {e}")
+
+    dataFile.close()
+    return uni

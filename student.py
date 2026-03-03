@@ -15,32 +15,48 @@ class Student():
         }
     
     
-    def __init__(self, name, id, Courses):
+    def __init__(self, name, id, Courses=None):
         """Initialize a student with name, id, and all currently enrolled courses SM"""
         self.name = name
         self.id = id
-        self.courses = Courses
+        if Courses is not None:
+            self.courses = Courses
+        else:
+            self.courses = {}
         
     def enroll(self,course,grade):
-        """Enroll the student in a new course with a grade SM"""
+        """Enroll the student in a new course with a grade and update list of students SM and DH"""
+        if grade not in self._grade_points:
+            raise ValueError(f"Invalid grade: {grade}")
         self.courses[course] = grade
+        course.addStudent(self)
         
     def updateGrade(self, course, grade):
         """If a student is already enrolled in a course, update their grade SM"""
+        if grade not in self._grade_points:
+            raise ValueError(f"Invalid grade: {grade}")
         if course in self.courses:
             self.courses[course] = grade
             
     def calcGPA(self):
         """Calculate the students gpa SM"""
-
-        total_points = 0
-        total_courses = len(self.courses)
+        totalPoints = 0.0
+        totalCreds = 0
+        for course, grade in self.courses.items():
+            totalPoints += self._grade_points.get(grade, 0.0) * course.cred
+            totalCreds += course.cred
+        if totalCreds > 0:
+            return round(totalPoints / totalCreds, 2) 
+        else:
+            return 0.0
         
-        for grade in self.courses.values():
-            total_points += self._grade_points.get(grade, 0)
-        
-        return total_points / total_courses if total_courses > 0 else 0.0
-        
+    def getCourses(self):
+        """Return a list of courses the student is enrolled in DH"""
+        return list(self.courses.keys())
+    
+    def getCourseInfo(self):
+        '''Return a list of tuples with course code, course object, and grade for all courses the student is enrolled in DH'''
+        return [(c.courseCode, self.courses[c], c.cred) for c in self.courses]
         
     def printCourses(self):
         """Testing method to print all courses and grades SM"""
