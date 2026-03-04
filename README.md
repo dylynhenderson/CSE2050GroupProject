@@ -9,5 +9,5 @@ python main.py
 
 **Run tests:**
 ```bash
-python -m unittest testAll -v
+python testAll.py
 ```
