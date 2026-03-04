@@ -1,4 +1,4 @@
-# CSE2050 — Group Project 
+# CSE2050 Group Project 
 ## Milestone 1
 Models a university system using object-oriented programming in Python. It loads student and course data from CSV files and stores them as objects to support queries such as GPA calculations, course enrollments, and student lookups.
 ### How to Run
