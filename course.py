@@ -10,6 +10,9 @@ class Course:
                 self.addStudent(i)
         
     def addStudent(self, s):
+        
+        
+        # this will work 
         '''Enroll a student in the course DH'''
         if s not in self.students:
             self.students.append(s)
