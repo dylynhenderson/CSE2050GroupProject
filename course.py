@@ -1,4 +1,4 @@
-class Course:
+class Course: #course.py
     '''Course object DH'''
     def __init__(self, courseCode, cred, Students=None):
         '''Create a course with a code, credit weight, and list of enrolled students DH'''
