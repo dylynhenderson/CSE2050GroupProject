@@ -1,4 +1,4 @@
-class Course: #course.py
+class Course:
     '''Course object DH'''
     def __init__(self, courseCode, cred, Students=None):
         '''Create a course with a code, credit weight, and list of enrolled students DH'''
@@ -11,8 +11,6 @@ class Course: #course.py
         
     def addStudent(self, s):
         
-        
-        # this will work 
         '''Enroll a student in the course DH'''
         if s not in self.students:
             self.students.append(s)
