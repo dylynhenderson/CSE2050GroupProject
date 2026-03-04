@@ -2,7 +2,6 @@ from university import loadUniversity
 
 def main():
     '''Main function to demonstrate university data loading and functionality DH'''
-    #wooooooooooooooo
     print("Loading university data...")
     uni = loadUniversity("university_data.csv", "course_catalog.csv")
     print(f"  Loaded {len(uni.students)} students and {len(uni.courses)} courses.\n")
