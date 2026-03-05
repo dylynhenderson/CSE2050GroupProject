@@ -2,6 +2,7 @@ import unittest
 from course import Course
 from student import Student
 from university import University
+from enrollrecord import EnrollmentRecord
 
 class TestCourse(unittest.TestCase):
     '''Test cases for the Course class SM'''
@@ -178,6 +179,26 @@ class TestUniversity(unittest.TestCase):
         '''Test that getStudentsInCourse returns empty list for unknown course DH'''
         self.assertEqual(self.uni.getStudentsInCourse("FAKE999"), [])
 
-
+class TestEnrollmentRecord(unittest.TestCase):
+    """Testing for EnrollmentRecord SM"""
+    
+    def setUp(self):
+        """create a student and a roster SM"""
+        self.s = Student("Sam", 3258039)
+        self.e = EnrollmentRecord()
+        
+    def testCreated(self):
+        """Testing the object is properly created SM"""
+        self.assertIsInstance(self.e, EnrollmentRecord )
+    
+    def testAdd(self):
+        """Testing adding a student to a record"""
+        self.e.addToRecord(self.s)
+        self.assertIn(self.s.id, self.e.eDict)
+        
+    
+    
+    
+    
 if __name__ == "__main__":
     unittest.main()
