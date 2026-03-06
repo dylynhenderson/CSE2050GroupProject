@@ -45,7 +45,7 @@ class University:
         '''Return a list of student IDs enrolled in a course SM'''
         course = self.getCourse(code)
         if course:
-            return list(course.students)
+            return list(course.enRec.makeList())
         return []
     
     def getAllGPAs(self):

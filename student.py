@@ -63,3 +63,7 @@ class Student():
         '''Testing method to print all courses and grades SM'''
         for course, grade in self.courses.items():
             print(f"Course: {course.name}, Grade: {grade}")
+            
+    def getId(self):
+        """Returns ID number, can be used match other attributes to proper student when accessing from an EnrollmentRecord SM"""
+        return self.id

@@ -37,6 +37,12 @@ class EnrollmentRecord():
     def __len__(self):
         return len(self.eDict)
     
+    def makeList(self):
+        l = []
+        for x in self.eDict:
+            l.append(x)
+        return l
+    
     
     
 x = EnrollmentRecord(5)
