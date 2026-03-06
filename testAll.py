@@ -3,6 +3,7 @@ from course import Course
 from student import Student
 from university import University
 from enrollrecord import EnrollmentRecord
+from datetime import *
 
 class TestCourse(unittest.TestCase):
     '''Test cases for the Course class SM'''
@@ -17,7 +18,7 @@ class TestCourse(unittest.TestCase):
         '''Test that a Course is correctly initialized SM'''
         self.assertEqual(self.c.courseCode, "CSE2050")
         self.assertEqual(self.c.cred, 3)
-        self.assertIsInstance(self.c.students, list)
+        self.assertIsInstance(self.c.enRec, EnrollmentRecord)
         self.assertEqual(len(self.c.students), 0)
 
     def testAddStudent(self):
@@ -185,7 +186,7 @@ class TestEnrollmentRecord(unittest.TestCase):
     def setUp(self):
         """create a student and a roster SM"""
         self.s = Student("Sam", 3258039)
-        self.e = EnrollmentRecord()
+        self.e = EnrollmentRecord(10)
         
     def testCreated(self):
         """Testing the object is properly created SM"""
@@ -197,8 +198,31 @@ class TestEnrollmentRecord(unittest.TestCase):
         self.assertIn(self.s.id, self.e.eDict)
         
     
-    
-    
+    def testMaxCap(self):
+        """Testing that the .isFull() method works as intended SM"""
+        #create 2 objects
+        er = EnrollmentRecord(5)
+        notFull = EnrollmentRecord(5)
+        
+        #populate 1 EnrollmentRecord fully
+        for i in range(5):
+            s = Student(i,i)
+            er.addToRecord(s)
+        
+        #one is full, one is empty
+        self.assertEqual(er.isFull(), True)
+        self.assertEqual(notFull.isFull(), False)
+        
+    def testGetEnrollDate(self):
+        """Testing that getEnrollDate returns the date based off an id, or raises error if student is not enrolled SM"""
+        d = EnrollmentRecord(5)
+        stu = Student("Sam", 3258049)
+        dateEx = d.addToRecord(stu)
+        with self.assertRaises(ValueError):
+            d.getEnrollDate(3258050)
+        self.assertEqual(d.getEnrollDate(3258049), dateEx)
+        
+        
     
 if __name__ == "__main__":
     unittest.main()
