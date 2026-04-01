@@ -28,7 +28,7 @@ class Student():
         if grade not in self._grade_points:
             raise ValueError(f"Invalid grade: {grade}")
         self.courses[course] = grade
-        course.addStudent(self)
+        course.request_enroll(self)
         
     def updateGrade(self, course, grade):
         '''If a student is already enrolled in a course, update their grade SM'''

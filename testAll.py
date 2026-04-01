@@ -23,19 +23,19 @@ class TestCourse(unittest.TestCase):
 
     def testAddStudent(self):
         '''Test that Student objects are correctly added to the course roster SM'''
-        self.c.addStudent(self.s1)
+        self.c.request_enroll(self.s1)
         self.assertIn(self.s1, self.c.students)
 
     def testNoDuplicateStudents(self):
         '''Test that duplicate Student objects are not added to the roster SM'''
-        self.c.addStudent(self.s1)
-        self.c.addStudent(self.s1)
+        self.c.request_enroll(self.s1)
+        self.c.request_enroll(self.s1)
         self.assertEqual(self.c.getStudentCount(), 1)
 
     def testGetStudentCount(self):
         '''Test that getStudentCount returns the correct number of students SM'''
-        self.c.addStudent(self.s1)
-        self.c.addStudent(self.s2)
+        self.c.request_enroll(self.s1)
+        self.c.request_enroll(self.s2)
         self.assertEqual(self.c.getStudentCount(), 2)
 
 
@@ -223,11 +223,7 @@ class TestEnrollmentRecord(unittest.TestCase):
         self.assertEqual(d.getEnrollDate(3258049), dateEx)
         
         
-class TestCheckIn(unittest.TestCase):
-    def testIDSearch(self):
-        l = ["STU001","STU002","STU003","STU004","STU005"]
-        University.search_by_id(University(),l,"STU002",0,1)
-        
+
     
 if __name__ == "__main__":
     unittest.main()

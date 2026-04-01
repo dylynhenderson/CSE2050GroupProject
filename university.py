@@ -1,5 +1,6 @@
 from course import Course
 from student import Student
+from structures import EnrollmentRecord
 import csv
 
 class University:
@@ -45,7 +46,7 @@ class University:
         '''Return a list of student IDs enrolled in a course SM'''
         course = self.getCourse(code)
         if course:
-            return list(course.enRec.makeList())
+            return list(EnrollmentRecord.makeList())
         return []
     
     def getAllGPAs(self):
