@@ -43,5 +43,5 @@ class TestSearchByID(unittest.TestCase):
         self.assertEqual(self.obj.search_by_id(data, "STU002", 0, len(data)-1), -1)
         
         
-if __name__ == "_main__":
+if __name__ == "__main__":
     unittest.main()
