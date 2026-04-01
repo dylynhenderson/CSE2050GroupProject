@@ -193,7 +193,7 @@ class TestEnrollmentRecord(unittest.TestCase):
         self.assertIsInstance(self.e, EnrollmentRecord )
     
     def testAdd(self):
-        """Testing adding a student to a record"""
+        """Testing adding a student to a record SM"""
         self.e.addToRecord(self.s)
         self.assertIn(self.s.id, self.e.eDict)
         
@@ -222,6 +222,11 @@ class TestEnrollmentRecord(unittest.TestCase):
             d.getEnrollDate(3258050)
         self.assertEqual(d.getEnrollDate(3258049), dateEx)
         
+        
+class TestCheckIn(unittest.TestCase):
+    def testIDSearch(self):
+        l = ["STU001","STU002","STU003","STU004","STU005"]
+        University.search_by_id(University(),l,"STU002",0,1)
         
     
 if __name__ == "__main__":

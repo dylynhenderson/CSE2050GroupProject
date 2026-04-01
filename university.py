@@ -88,6 +88,25 @@ class University:
         s2 = set(s.id for s in self.getStudentsInCourse(code2))
         return [self.students[id] for id in s1 & s2]
     
+    def search_by_id(self, idList, targetID, left, right):
+        """Recursive Binary Search to find an ID in a list SM"""
+        if left > right:
+            return -1
+    
+        mid = (left + right) // 2
+    
+        # If target is found
+        if idList[mid] == targetID:
+            return mid
+    
+        # Search left half
+        elif targetID < idList[mid]:
+            return self.search_by_id(idList, targetID, left, mid - 1)
+    
+        # Search right half
+        else:
+            return self.search_by_id(idList, targetID, mid + 1, right)
+    
 def loadUniversity(dataCsv, catalogCsv):
     '''Read CSV files and return a fully populated University object DH'''
     uni = University()
