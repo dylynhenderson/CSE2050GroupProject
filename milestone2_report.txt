@@ -1,0 +1,56 @@
+CSE 2050 — Milestone 2 Report 
+
+1. LinkedQueue — enqueue and dequeue
+enqueue: O(1)
+  We maintain a direct reference to both the head and tail nodes. Adding a new
+  node to the back only requires updating tail.next and reassigning tail which is a
+  constant number of pointer operations regardless of queue size.
+
+dequeue: O(1)
+  Removing from the front only requires reading head.data and advancing head to
+  head.next. Again, this is a constant number of operations. The only edge case  
+  is resetting tail to None when the last element is removed, which is still O(1).
+
+
+2. Sorting algorithms
+Selection Sort — O(n^2) time, O(1) extra space
+  For each position i in the list, the algorithm scans the remaining n-i elements
+  to find the minimum. This produces a nested loop with roughly n*(n-1)/2
+  comparisons in all cases, best, average, and worst are all O(n^2). The sort
+  is done in  place so no extra memory is needed beyond a single swap variable.
+
+Insertion Sort — O(n^2) worst/average, O(n) best case, O(1) extra space
+  Each element is inserted into its correct position among the already sorted 
+  prefix by shifting larger elements right. In the worst case, reverse sorted, 
+  this is O(n^2) comparisons and shifts. In the best case, already sorted,
+  the inner while loop never executes, making it O(n).
+
+
+3. Recursive binary search
+Time complexity: O(log n)
+  Each recursive call eliminates half of the remaining search range. Starting
+  with n records, the search reaches a base case in at most log2(n) calls. This
+  is a dramatic improvement over a linear scan (O(n)) for large rosters.
+
+Why sorting is required for correctness:
+  Binary search works by comparing the target against the middle element and
+  deciding whether to go left or right. This decision is only valid when the
+  elements are in sorted order, if the roster is unsorted, the half that does
+  not contain the middle element might actually contain the target, and the
+  algorithm would incorrectly discard it. Our drop() method auto resorts by ID
+  before searching to guarantee this precondition is always met.
+
+
+4. Comparison of the two sorting algorithms
+Selection sort makes exactly the same number of comparisons no matter the
+input, it always scans the full unsorted suffix to find each minimum. This  
+makes it predictable but never fast for nearly sorted data.
+
+Insertion sort is adaptive. On nearly sorted input it runs close
+to O(n) because very few shifts are needed. For a course roster that gets
+updated incrementally, like one new enrollment added at a time, insertion sort
+is the better choice because the list is almost always already in order.
+
+Selection sort is preferable when the cost of swapping records is very high
+relative to comparisons, it uses at most n-1 swaps as opposed to insertion sort's 
+potentially O(n^2) shifts. 
