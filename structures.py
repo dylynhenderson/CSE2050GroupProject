@@ -86,3 +86,34 @@ class EnrollmentRecord:
         self.student = student
         self.enroll_date = enroll_date
         
+class HashMap:
+    """Hashmap implementation for prerequisites"""
+    
+    def __init__(self, size):
+        """Init the hasmap SM"""
+        self.size = size
+        self.buckets = [[] for _ in range(size)]
+        
+    def _hash(self, key):
+        """Private function to hash the key SM"""
+        return hash(key) % self.size
+    
+    def set(self, key, value):
+        """Sets values SM"""
+        idx = self._hash(key)
+        
+        for pair in self.buckets[idx]:
+            if pair[0] == key:
+                pair[1] = value
+                return
+        self.buckets[idx].append([key,value])
+        
+    def get(self, key):
+        """Gets values SM"""
+        idx = self._hash(key)
+        
+        for pair in self.buckets[idx]:
+            if pair[0] == key:
+                return pair[1]
+            
+        return None

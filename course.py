@@ -16,9 +16,13 @@ class Course:
         self._undo_stack = Stack()
 
     def request_enroll(self, student, enroll_date=None):
-        '''Enroll a student directly if space exists, otherwise place them on the waitlist.'''
+        '''Enroll a student directly if space exists, otherwise place them on the waitlist.
+        
+        Duplicate enrollments and duplicate waitlist entries are both silently ignored.
+        Successful direct enrollments are pushed to the undo stack DH'''
         if enroll_date is None:
             enroll_date = datetime.now().strftime("%Y-%m-%d")
+
         for record in self.enrolled_roster:
             if record.student.id == student.id:
                 return
@@ -34,11 +38,11 @@ class Course:
                 self._waitlisted_ids.add(student.id)
 
     def drop(self, student_id, enroll_date_for_replacement=None):
-        """Remove a student from the roster by ID and promote the next waitlisted student if any
+        '''Remove a student from the roster by ID and promote the next waitlisted student if any.
         
         If the roster is not currently sorted by ID it is automatically re-sorted
         before the binary search runs.
-        Successful drops are pushed to the undo stack DH"""
+        Successful drops are pushed to the undo stack DH'''
         if self.current_sort_key != 'id':
             self.sort_enrolled('id')
 
