@@ -87,7 +87,7 @@ class EnrollmentRecord:
         self.enroll_date = enroll_date
         
 class HashMap:
-    """Hashmap implementation for prerequisites"""
+    """Hashmap implementation for prerequisites SM"""
     
     def __init__(self, size):
         """Init the hasmap SM"""
@@ -99,7 +99,13 @@ class HashMap:
         return hash(key) % self.size
     
     def set(self, key, value):
-        """Sets values SM"""
+        """Sets values, if this value would make it 80% full, rehash SM"""
+        
+        #check to see if we need to rehash before adding the new key-value pair
+        if self.size + 1 / self.buckets >= 0.8:
+            self._rehash()
+        
+        #if no rehash, continue with adding key and value
         idx = self._hash(key)
         
         for pair in self.buckets[idx]:
@@ -117,3 +123,14 @@ class HashMap:
                 return pair[1]
             
         return None
+    
+    def _rehash(self):
+        """Rehashes the hashmap if at 80% capacity SM"""
+        
+        old_buckets = self.buckets
+        self.size *= 2
+        self.buckets = [[] for _ in range(self.size)]
+        
+        for bucket in old_buckets:
+            for key, value in bucket:
+                self.set(key, value)

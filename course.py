@@ -1,5 +1,5 @@
 from datetime import datetime
-from structures import LinkedQueue, Stack, EnrollmentRecord
+from structures import LinkedQueue, Stack, EnrollmentRecord, HashMap
 
 class Course:
     '''Course object updated for Milestone 2 DH and SM'''
@@ -14,6 +14,7 @@ class Course:
         self.current_sort_key = None
         self._waitlisted_ids = set()
         self._undo_stack = Stack()
+        self.prerequisites = HashMap(10)
 
     def request_enroll(self, student, enroll_date=None):
         '''Enroll a student directly if space exists, otherwise place them on the waitlist.
