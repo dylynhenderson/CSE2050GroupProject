@@ -133,3 +133,4 @@ class Course:
     def getStudentCount(self):
         '''Return the number of students currently enrolled in the course DH'''
         return len(self.enrolled_roster)
+    
