@@ -11,7 +11,6 @@ class Node:
         """Returns Representation"""
         return f"Node({self.item})"
     
-    
 class LinkedList:
     def __init__(self, items: Optional[Iterable[Any]] = None) -> None:
         """Initializes the LinkedList. If items is provided, it will be added to the list in order."""
@@ -83,8 +82,6 @@ class LinkedList:
         current.link = None
         self.size -= 1
         return item
-        
-        
         
     def __len__(self):
         """Returns the number of items in the list."""
