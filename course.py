@@ -1,15 +1,17 @@
 from datetime import datetime
-from structures import LinkedQueue, EnrollmentRecord
+from structures import LinkedQueue, EnrollmentRecord, HashMap
+
 
 class Course:
     '''Course object updated for Milestone 2 DH and SM'''
-    def __init__(self, courseCode, cred, maxStu=0):
+    def __init__(self, courseCode, cred, maxStu=0, prereqs = 0):
         self.courseCode = courseCode
         self.cred = cred
         self.maxStudents = maxStu
         self.enrolled_roster = []
         self.waitlist = LinkedQueue()
         self.current_sort_key = None
+        self.prereqs = prereqs
 
     def request_enroll(self, student, enroll_date=None):
         '''Enroll student or add to waitlist if full DH'''
