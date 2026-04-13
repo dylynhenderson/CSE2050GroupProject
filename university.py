@@ -1,6 +1,8 @@
+from fileinput import filename
+
 from course import Course
 from student import Student
-from structures import EnrollmentRecord
+from structures import EnrollmentRecord, HashMap
 import csv
 
 class University:
@@ -108,6 +110,8 @@ class University:
         else:
             return self.search_by_id(idList, targetID, mid + 1, right)
     
+    
+    
 def loadUniversity(dataCsv, catalogCsv):
     '''Read CSV files and return a fully populated University object DH'''
     uni = University()
@@ -156,3 +160,36 @@ def loadUniversity(dataCsv, catalogCsv):
 
     dataFile.close()
     return uni
+
+
+   
+def loadprerequisites(filename):
+    '''Read CSV file and return a HashMap of course prerequisites SM'''
+    prereqMap = HashMap(10)
+
+    with open(filename, newline="") as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            row = {k.strip(): v.strip() for k, v in row.items()}
+
+            course = row.get("course_id")
+            prereq = row.get("prerequisite")
+
+            if course is None:
+                continue
+
+            if prereq == "" or prereq is None:
+                if prereqMap.get(course) is None:
+                    prereqMap.set(course, [])
+                continue
+
+            existing = prereqMap.get(course)
+
+            if existing is None:
+                prereqMap.set(course, [prereq])
+            else:
+                existing.append(prereq)
+                prereqMap.set(course, existing)
+
+    return prereqMap

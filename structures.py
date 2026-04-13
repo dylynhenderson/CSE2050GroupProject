@@ -90,8 +90,9 @@ class HashMap:
     """Hashmap implementation for prerequisites SM"""
     
     def __init__(self, size):
-        """Init the hasmap SM"""
+        """Initialize the hashmap with a given size SM"""
         self.size = size
+        self.count = 0
         self.buckets = [[] for _ in range(size)]
         
     def _hash(self, key):
@@ -100,19 +101,22 @@ class HashMap:
     
     def set(self, key, value):
         """Sets values, if this value would make it 80% full, rehash SM"""
-        
-        #check to see if we need to rehash before adding the new key-value pair
-        if self.size + 1 / self.buckets >= 0.8:
+
+        # load factor check
+        if self.count / self.size >= 0.8:
             self._rehash()
-        
-        #if no rehash, continue with adding key and value
+
         idx = self._hash(key)
-        
+
         for pair in self.buckets[idx]:
             if pair[0] == key:
                 pair[1] = value
                 return
-        self.buckets[idx].append([key,value])
+
+        self.buckets[idx].append([key, value])
+        self.count += 1
+
+        
         
     def get(self, key):
         """Gets values SM"""
@@ -125,12 +129,15 @@ class HashMap:
         return None
     
     def _rehash(self):
-        """Rehashes the hashmap if at 80% capacity SM"""
-        
+        """Rehashes the hashmap when load factor exceeds 0.8 (80%) SM"""
         old_buckets = self.buckets
+
         self.size *= 2
         self.buckets = [[] for _ in range(self.size)]
-        
+        self.count = 0
+
         for bucket in old_buckets:
             for key, value in bucket:
-                self.set(key, value)
+                idx = self._hash(key)
+                self.buckets[idx].append([key, value])
+                self.count += 1
