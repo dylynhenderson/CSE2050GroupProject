@@ -114,56 +114,44 @@ class University:
     
 def loadUniversity(enrollmentFile, catalogFile, prereqFile):
     '''Load students, course catalog, and prerequisites into the University system DH'''
+    from university import University
+    from student import Student
+    from course import Course
+    from structures import EnrollmentRecord
+    
     uni = University()
 
-    # 1. Load Catalog (Course IDs and Capacities)
+    # Load Course Catalog
     with open(catalogFile, 'r') as file:
         lines = file.readlines()
         for line in lines[1:]:
             parts = line.strip().split(',')
-            # course_id, course_title, credits, department, capacity
             if len(parts) >= 5:
-                courseId = parts[0]
-                credits = int(parts[2])
-                capacity = int(parts[4])
-                c = Course(courseId, credits, capacity)
-                uni.courses[courseId] = c
+                c = Course(parts[0], int(parts[2]), int(parts[4]))
+                uni.courses[parts[0]] = c
 
-    # 2. Load Prerequisites (Required for 4/22 Lab)
+    # Load Prerequisites
     with open(prereqFile, 'r') as file:
         lines = file.readlines()
         for line in lines[1:]:
-            # cse_prerequisites.csv uses tabs as the delimiter
             parts = line.strip().split('\t')
             if len(parts) >= 2:
-                courseId = parts[0]
-                prereqId = parts[1]
-                if courseId in uni.courses and prereqId != "":
-                    # Store prerequisite in the Course's HashMap DH
+                courseId, prereqId = parts[0], parts[1]
+                if courseId in uni.courses and prereqId:
                     uni.courses[courseId].prerequisites.put(courseId, prereqId)
 
-    # 3. Load Student History and Existing Enrollments
+    # Load Student History
     with open(enrollmentFile, 'r') as file:
         lines = file.readlines()
         for line in lines[1:]:
             parts = line.strip().split(',')
             if len(parts) >= 4:
-                studentId = parts[0]
-                courseId = parts[1]
-                grade = parts[3]
-                
-                if studentId not in uni.students:
-                    uni.students[studentId] = Student(studentId, "Unknown Name")
-                
-                # Add to student history for prerequisite checking
-                uni.students[studentId].courses[courseId] = grade
-                
-                # If course exists, add student to the enrolled_roster
-                if courseId in uni.courses:
-                    # Note: We use a simple enroll here to skip prereq checks for history
-                    from structures import EnrollmentRecord
-                    record = EnrollmentRecord(uni.students[studentId], "2024-01-01")
-                    uni.courses[courseId].enrolled_roster.append(record)
+                sId, cId, grade = parts[0], parts[1], parts[3]
+                if sId not in uni.students:
+                    uni.students[sId] = Student(sId, "Unknown Name")
+                uni.students[sId].courses[cId] = grade
+                if cId in uni.courses:
+                    uni.courses[cId].enrolled_roster.append(EnrollmentRecord(uni.students[sId], "2024-01-01"))
 
     return uni
    

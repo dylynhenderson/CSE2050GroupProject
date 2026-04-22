@@ -3,7 +3,12 @@ from university import loadUniversity
 def main():
     '''Main function to demonstrate university data loading and functionality DH'''
     print("Loading university data...")
-    uni = loadUniversity("university_data.csv", "course_catalog.csv")
+
+    enrollments = "enrollments_CSE10.csv"
+    catalog = "course_catalog_CSE10_with_capacity.csv"
+    prereqs = "cse_prerequisites.csv"
+    
+    uni = loadUniversity(enrollments, catalog, prereqs)
     print(f"  Loaded {len(uni.students)} students and {len(uni.courses)} courses.\n")
 
     sampleCode1 = list(uni.courses.keys())[0]
