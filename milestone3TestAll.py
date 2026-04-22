@@ -1,5 +1,7 @@
 import unittest
 from structures import HashMap
+from student import Student
+from course import Course
 
 
 class TestHashMapBasic(unittest.TestCase):
@@ -106,6 +108,38 @@ class TestHashMapRehashing(unittest.TestCase):
         for i in range(20):
             self.assertEqual(hm.get(f"key{i}"), i * 10)
 
+class TestPrerequisiteEnrollment(unittest.TestCase):
+    '''Verify that enrollment correctly enforces prerequisite rules DH'''
+
+    def setUp(self):
+        '''Setup a course and a student for enrollment testing DH'''
+        self.c = Course("CSE2050", 3, 1) # Cap of 1
+        self.s = Student("STU01", "Test Student")
+
+    def testPrereqSuccess(self):
+        '''Ensure student can enroll if they have the prerequisite DH'''
+        self.c.prerequisites.put("CSE2050", "CSE1010")
+        self.s.courses["CSE1010"] = "A" # Add to history
+        
+        self.c.request_enroll(self.s)
+        self.assertEqual(len(self.c.enrolled_roster), 1)
+
+    def testPrereqMissingRaisesException(self):
+        '''Ensure Exception is raised when student lacks prerequisite DH'''
+        self.c.prerequisites.put("CSE2050", "CSE1010")
+        # Student history is empty
+        
+        with self.assertRaises(Exception):
+            self.c.request_enroll(self.s)
+
+    def testPrereqMetButCourseFull(self):
+        '''Ensure student moves to waitlist if prereq is met but roster is full DH'''
+        self.c.maxStudents = 0 # Force waitlist
+        self.c.prerequisites.put("CSE2050", "CSE1010")
+        self.s.courses["CSE1010"] = "B"
+        
+        self.c.request_enroll(self.s)
+        self.assertEqual(len(self.c.waitlist), 1)
 
 if __name__ == "__main__":
     unittest.main()

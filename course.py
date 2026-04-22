@@ -24,6 +24,12 @@ class Course:
         if enroll_date is None:
             enroll_date = datetime.now().strftime("%Y-%m-%d")
 
+        requiredPrereq = self.prerequisites.get(self.courseCode)
+        if requiredPrereq:
+            if requiredPrereq not in student.courses:
+                raise Exception(f"Prerequisite {requiredPrereq} not met for {self.courseCode}")
+
+
         for record in self.enrolled_roster:
             if record.student.id == student.id:
                 return

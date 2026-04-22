@@ -112,56 +112,60 @@ class University:
     
     
     
-def loadUniversity(dataCsv, catalogCsv):
-    '''Read CSV files and return a fully populated University object DH'''
+def loadUniversity(enrollmentFile, catalogFile, prereqFile):
+    '''Load students, course catalog, and prerequisites into the University system DH'''
     uni = University()
 
-    # Load courses from course_catalog.csv
-    catalogFile = open(catalogCsv)
-    catalog = csv.DictReader(catalogFile)
-    for row in catalog:
-        code    = row['course_code']
-        credits = int(row['credits'])
-        uni.addCourse(code, credits)
-    catalogFile.close()
+    # 1. Load Catalog (Course IDs and Capacities)
+    with open(catalogFile, 'r') as file:
+        lines = file.readlines()
+        for line in lines[1:]:
+            parts = line.strip().split(',')
+            # course_id, course_title, credits, department, capacity
+            if len(parts) >= 5:
+                courseId = parts[0]
+                credits = int(parts[2])
+                capacity = int(parts[4])
+                c = Course(courseId, credits, capacity)
+                uni.courses[courseId] = c
 
-    # Load students from university_data.csv
-    dataFile = open(dataCsv)
-    data = csv.DictReader(dataFile)
-    for row in data:
-        id   = row['student_id']
-        name = row['name']
+    # 2. Load Prerequisites (Required for 4/22 Lab)
+    with open(prereqFile, 'r') as file:
+        lines = file.readlines()
+        for line in lines[1:]:
+            # cse_prerequisites.csv uses tabs as the delimiter
+            parts = line.strip().split('\t')
+            if len(parts) >= 2:
+                courseId = parts[0]
+                prereqId = parts[1]
+                if courseId in uni.courses and prereqId != "":
+                    # Store prerequisite in the Course's HashMap DH
+                    uni.courses[courseId].prerequisites.put(courseId, prereqId)
 
-        try:
-            student = uni.addStudent(id, name)
-        except ValueError as e:
-            print(f"[SKIP] {e}")
-            continue
+    # 3. Load Student History and Existing Enrollments
+    with open(enrollmentFile, 'r') as file:
+        lines = file.readlines()
+        for line in lines[1:]:
+            parts = line.strip().split(',')
+            if len(parts) >= 4:
+                studentId = parts[0]
+                courseId = parts[1]
+                grade = parts[3]
+                
+                if studentId not in uni.students:
+                    uni.students[studentId] = Student(studentId, "Unknown Name")
+                
+                # Add to student history for prerequisite checking
+                uni.students[studentId].courses[courseId] = grade
+                
+                # If course exists, add student to the enrolled_roster
+                if courseId in uni.courses:
+                    # Note: We use a simple enroll here to skip prereq checks for history
+                    from structures import EnrollmentRecord
+                    record = EnrollmentRecord(uni.students[studentId], "2024-01-01")
+                    uni.courses[courseId].enrolled_roster.append(record)
 
-        # courses field looks like: "CSE1010:A;MATH2010:B+;CSE2050:C"
-        # split by ; to get each course entry
-        coursesList = row['courses'].strip(';').split(';')
-
-        for entry in coursesList:
-            # entry looks like "CSE1010:A"
-            # split by : to get code and grade
-            parts = entry.split(':')
-            code  = parts[0]
-            grade = parts[1]
-
-            course = uni.getCourse(code)
-            if course is None:
-                course = uni.addCourse(code, 0)
-
-            try:
-                student.enroll(course, grade)
-            except ValueError as e:
-                print(f"[SKIP] {e}")
-
-    dataFile.close()
     return uni
-
-
    
 def loadprerequisites(filename):
     '''Read CSV file and return a HashMap of course prerequisites SM'''
