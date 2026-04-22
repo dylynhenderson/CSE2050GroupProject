@@ -181,15 +181,15 @@ def loadprerequisites(filename):
 
             if prereq == "" or prereq is None:
                 if prereqMap.get(course) is None:
-                    prereqMap.set(course, [])
+                    prereqMap.put(course, [])
                 continue
 
             existing = prereqMap.get(course)
 
             if existing is None:
-                prereqMap.set(course, [prereq])
+                prereqMap.put(course, [prereq])
             else:
                 existing.append(prereq)
-                prereqMap.set(course, existing)
+                prereqMap.put(course, existing)
 
     return prereqMap

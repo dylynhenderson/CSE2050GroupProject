@@ -99,13 +99,8 @@ class HashMap:
         """Private function to hash the key SM"""
         return hash(key) % self.size
     
-    def set(self, key, value):
-        """Sets values, if this value would make it 80% full, rehash SM"""
-
-        # load factor check
-        if self.count / self.size >= 0.8:
-            self._rehash()
-
+    def put(self, key, value):
+        """Sets values, if this value would make it 80% full, rehash SM and DH"""
         idx = self._hash(key)
 
         for pair in self.buckets[idx]:
@@ -116,7 +111,9 @@ class HashMap:
         self.buckets[idx].append([key, value])
         self.count += 1
 
-        
+        # load factor check
+        if self.count / self.size >= 0.8:
+            self._rehash()
         
     def get(self, key):
         """Gets values SM"""
@@ -130,13 +127,13 @@ class HashMap:
     
     def _rehash(self):
         """Rehashes the hashmap when load factor exceeds 0.8 (80%) SM"""
-        old_buckets = self.buckets
+        oldBuckets = self.buckets
 
         self.size *= 2
         self.buckets = [[] for _ in range(self.size)]
         self.count = 0
 
-        for bucket in old_buckets:
+        for bucket in oldBuckets:
             for key, value in bucket:
                 idx = self._hash(key)
                 self.buckets[idx].append([key, value])
