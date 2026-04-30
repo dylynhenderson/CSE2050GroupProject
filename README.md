@@ -10,5 +10,5 @@ python main.py
 
 **Run tests:**
 ```bash
-python milestone3TestAll.py
+python test_milestone3.py
 ```
