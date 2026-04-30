@@ -1,0 +1,17 @@
+Complexity report
+
+
+1. Merge Sort
+	Merge sort has an average time complexity of O(nlogn). It is very consistent with the best, worst and average cases all being O(nlogn). It is better on large external data sets, such as the .csv files we are using in the project. Merge sort is considered a stable algoritm.
+
+2. Quick Sort
+	Quicksort also has an average time complexity of O(nlogn). The best it is is also O(nlogn). It can get to be as bad as O(n^2). This happens when the largest or smallest element gets selected as the pivot. This worst case can also happen when the data being sorted is already sorted. Quicksort is better for smaller data sets, such as a roster of students or our waitlist. It is also considered to be an unstable algorithm.
+
+3. Comparison
+	Merge and Quick sort both have advantages and disadvantages. Merge sort is usually more predictable and stable, which is why it is good for large data sets. Quicksort is faster in practice but can be much slower when a poor pivot is chosen. 
+
+4. HashMap put()
+	The average runtime for .put() is O(1). The worst case is O(n) when there is many collisions in the same bucket. To avoid this, we rehash the table at 80% full. This doubles the size of the table and then redistributes the values into different buckets, reducing the likelihood of multiple collisions. .put() is O(1) because it does not depend on the total number of elements in the table, and on average each bucket stays small, it is able to immediately put the item where it belongs based on the hash value.
+
+5. HashMap get()
+	The average for .get() is the same for put; O(1). The worst case is also the same; O(n). .get() only has to look at the bucket where it knows the value should be at, which is why it is O(1). However, if there is a collision, it then has to search through the list of items in that bucket in order to be able to find the correct value. This is a situation where it would end up being O(n).
