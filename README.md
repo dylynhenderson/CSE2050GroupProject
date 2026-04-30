@@ -1,6 +1,6 @@
 # CSE2050 Group Project 
-## Milestone 1
-Models a university system using object-oriented programming in Python. It loads student and course data from CSV files and stores them as objects to support queries such as GPA calculations, course enrollments, and student lookups.
+## Milestone 3
+This project implements a comprehensive University Management System that models students, courses, and complex enrollment logistics. It focuses on the practical application of efficient data structures and algorithms, including custom HashMaps for prerequisite management, LinkedQueues for waitlisting, and logarithmic sorting (Merge and Quick Sort) for roster organization, to ensure high performance and scalability in academic record-keeping.
 ### How to Run
 
 **Run demonstrations:**
@@ -10,5 +10,5 @@ python main.py
 
 **Run tests:**
 ```bash
-python milestone2TestAll.py
+python milestone3TestAll.py
 ```
