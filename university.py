@@ -39,9 +39,7 @@ class University:
     def getCourseEnrollment(self, code):
         '''Return the number of students enrolled in a course SM'''
         course = self.getCourse(code)
-        if course:
-            return course.getStudentCount()
-        return 0
+        return course.getStudentCount() if course else 0
     
     def getStudentsInCourse(self, code):
         '''Return a list of student IDs enrolled in a course SM and DH'''
@@ -52,25 +50,17 @@ class University:
     
     def getAllGPAs(self):
         '''Return a list of all student GPAs in the university DH'''
-        gpas = []
-        for s in self.students.values():
-            gpas.append(s.calcGPA())
-        return gpas
+        return [s.calcGPA() for s in self.students.values()]
     
     def meanGPA(self):
         ''''Calculate and return the mean GPA of all students in the university DH'''
         gpas = self.getAllGPAs()
-        if gpas:
-            return round(sum(gpas) / len(gpas), 2)
-        else:
-            return 0.0
+        return round(sum(gpas) / len(gpas), 2) if gpas else 0.0
 
     def modeGPA(self):
         '''Calculate and return the mode GPA of all students in the university DH'''
         gpas = self.getAllGPAs()
-        if not gpas:
-            return 0.0
-        return max(set(gpas), key=gpas.count)
+        return max(set(gpas), key=gpas.count) if gpas else 0.0
         
     def medianGPA(self):
         '''Calculate and return the median GPA of all students in the university DH'''
@@ -79,17 +69,13 @@ class University:
         if n == 0:
             return 0.0
         mid = n // 2
-        if n % 2 == 0:
-            return round((gpas[mid - 1] + gpas[mid]) / 2, 2)
-        else:
-            return gpas[mid]
+        return round((gpas[mid - 1] + gpas[mid]) / 2, 2) if n % 2 == 0 else gpas[mid]
         
     def getCommonStudents(self, code1, code2):
         '''Return a list of student IDs enrolled in both courses DH'''
         s1 = set(s.id for s in self.getStudentsInCourse(code1))
         s2 = set(s.id for s in self.getStudentsInCourse(code2))
-        common_ids = s1 & s2
-        return [self.students[sid] for sid in common_ids]
+        return [self.students[sid] for sid in s1 & s2]
 
     def search_by_id(self, idList, targetID, left, right):
         """Recursive Binary Search to find an ID in a list SM"""
@@ -110,69 +96,54 @@ def loadUniversity(enrollmentFile, catalogFile, prereqFile):
     '''Load students, course catalog, and prerequisites into the University system DH'''
     uni = University()
 
-    with open(catalogFile, 'r') as file:
-        lines = file.readlines()
-        for line in lines[1:]:
-            parts = line.strip().split(',')
-            if len(parts) >= 5:
-                uni.addCourse(parts[0], int(parts[2]), int(parts[4]))
+    with open(catalogFile, 'r') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            uni.addCourse(row['course_id'], int(row['credits']), int(row['capacity']))
 
-    with open(prereqFile, 'r') as file:
-        lines = file.readlines()
-        for line in lines[1:]:
-            parts = line.strip().split(',')
-            if len(parts) >= 2:
-                courseId, prereqId = parts[0], parts[1]
-                if courseId in uni.courses and prereqId:
-                    uni.courses[courseId].prerequisites.put(courseId, prereqId)
+    with open(prereqFile, 'r') as f:
+        reader = csv.DictReader(f, delimiter='\t')
+        for row in reader:
+            courseId = row.get('course_id', '').strip()
+            prereqId = row.get('prerequisite', '').strip()
+            if courseId and courseId in uni.courses and prereqId:
+                uni.courses[courseId].prerequisites.put(courseId, prereqId)
 
-    with open(enrollmentFile, 'r') as file:
-        lines = file.readlines()
-        for line in lines[1:]:
-            parts = line.strip().split(',')
-            if len(parts) >= 4:
-                sId, cId, grade = parts[0], parts[1], parts[3]
-                if sId not in uni.students:
-                    uni.addStudent(sId, "Unknown Name")
-                
-                student = uni.students[sId]
-                student.courses[cId] = grade
-                
-                if cId in uni.courses:
-                    try:
-                        uni.courses[cId].request_enroll(student, "2024-01-01")
-                    except Exception:
-                        pass
+    with open(enrollmentFile, 'r') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            sId = row['student_id']
+            cId = row['course_id']
+            grade = row.get('grade', '').strip()
+ 
+            if sId not in uni.students:
+                uni.addStudent(sId, f"Student_{sId[3:]}")
+ 
+            student = uni.students[sId]
+            if cId in uni.courses:
+                course_obj = uni.courses[cId]
+                student.courses[course_obj] = grade if grade else "IP" 
+                try:
+                    course_obj.request_enroll(student, "2026-01-01")
+                except Exception:
+                    pass
 
     return uni
    
 def loadprerequisites(filename):
-    '''Read CSV file and return a HashMap of course prerequisites SM'''
+    '''Read CSV file and return a HashMap of course prerequisites SM and DH'''
     prereqMap = HashMap(10)
-
-    with open(filename, newline="") as file:
-        reader = csv.DictReader(file)
-
+    with open(filename, newline='') as f:
+        reader = csv.DictReader(f, delimiter='\t')
         for row in reader:
-            row = {k.strip(): v.strip() for k, v in row.items()}
-
-            course = row.get("course_id")
-            prereq = row.get("prerequisite")
-
-            if course is None:
+            course = row.get('course_id', '').strip()
+            prereq = row.get('prerequisite', '').strip()
+            if not course:
                 continue
-
-            if prereq == "" or prereq is None:
+            if prereq:
+                existing = prereqMap.get(course)
+                prereqMap.put(course, (existing or []) + [prereq])
+            else:
                 if prereqMap.get(course) is None:
                     prereqMap.put(course, [])
-                continue
-
-            existing = prereqMap.get(course)
-
-            if existing is None:
-                prereqMap.put(course, [prereq])
-            else:
-                existing.append(prereq)
-                prereqMap.put(course, existing)
-
     return prereqMap

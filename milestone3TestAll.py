@@ -8,26 +8,25 @@ class TestHashMapBasic(unittest.TestCase):
     """Tests for basic put and get operations on the HashMap DH"""
 
     def setUp(self):
-        """Initialize a small HashMap before each test DH"""
         self.hm = HashMap(5)
 
     def testPutAndGet(self):
-        """Verify that a value stored with put is correctly returned by get DH"""
+        """Value stored with put is correctly returned by get DH"""
         self.hm.put("CSE1010", ["none"])
         self.assertEqual(self.hm.get("CSE1010"), ["none"])
 
     def testGetMissingKeyReturnsNone(self):
-        """Verify that get returns None for a key that was never inserted DH"""
+        """get returns None for a key never inserted DH"""
         self.assertIsNone(self.hm.get("CSE9999"))
 
     def testOverwriteExistingKey(self):
-        """Verify that putting a duplicate key updates the value rather than adding a new entry DH"""
+        """Putting a duplicate key updates the value DH"""
         self.hm.put("CSE2050", ["CSE1010"])
         self.hm.put("CSE2050", ["CSE1010", "MATH1010"])
         self.assertEqual(self.hm.get("CSE2050"), ["CSE1010", "MATH1010"])
 
     def testCountDoesNotIncreaseOnOverwrite(self):
-        """Verify that overwriting an existing key does not increment the internal count DH"""
+        """Overwriting an existing key does not increment count DH"""
         self.hm.put("CSE2050", ["CSE1010"])
         countBefore = self.hm.count
         self.hm.put("CSE2050", ["CSE1010", "MATH1010"])
@@ -38,7 +37,7 @@ class TestHashMapCollisions(unittest.TestCase):
     """Tests for collision handling via separate chaining DH"""
 
     def testCollisionsStoredInSameBucket(self):
-        """Verify that multiple keys hashing to the same bucket are all retrievable DH"""
+        """Multiple keys forced to the same bucket are all retrievable DH"""
         forcedCollisionMap = HashMap(1)
         forcedCollisionMap.put("keyA", "valueA")
         forcedCollisionMap.put("keyB", "valueB")
@@ -48,14 +47,14 @@ class TestHashMapCollisions(unittest.TestCase):
         self.assertEqual(forcedCollisionMap.get("keyC"), "valueC")
 
     def testCollisionBucketContainsMultipleEntries(self):
-        """Verify that two integer keys that always map to the same bucket are both stored there DH"""
+        """Two integer keys that map to the same bucket are both stored there DH"""
         hm = HashMap(10)
         hm.put(0, "alpha")
         hm.put(10, "beta")
         self.assertGreater(len(hm.buckets[0]), 1)
 
     def testCollisionOverwritePreservesOtherKeys(self):
-        """Verify that overwriting one colliding key does not corrupt the others DH"""
+        """Overwriting one colliding key does not corrupt others DH"""
         forcedCollisionMap = HashMap(1)
         forcedCollisionMap.put("keyA", "original")
         forcedCollisionMap.put("keyB", "stays")
@@ -65,10 +64,10 @@ class TestHashMapCollisions(unittest.TestCase):
 
 
 class TestHashMapRehashing(unittest.TestCase):
-    """Tests for load-factor-triggered rehashing behavior DH"""
+    """Tests for load-factor-triggered rehashing DH"""
 
     def testRehashDoublesTableSize(self):
-        """Verify that the bucket count doubles once the load factor reaches 0.8 DH"""
+        """Bucket count doubles once load factor reaches 0.8 DH"""
         hm = HashMap(5)
         initialSize = hm.size
         for i in range(4):
@@ -76,7 +75,7 @@ class TestHashMapRehashing(unittest.TestCase):
         self.assertEqual(hm.size, initialSize * 2)
 
     def testRehashTriggersAtExact80Percent(self):
-        """Verify that 3 keys in a size-5 table do not trigger a rehash but the 4th does DH"""
+        """3 keys in size-5 table do not rehash; 4th does DH"""
         hm = HashMap(5)
         for i in range(3):
             hm.put(f"key{i}", i)
@@ -85,7 +84,7 @@ class TestHashMapRehashing(unittest.TestCase):
         self.assertEqual(hm.size, 10)
 
     def testAllDataPreservedAfterRehash(self):
-        """Verify that every key inserted before the rehash is still retrievable after it DH"""
+        """Every key inserted before rehash is still retrievable after DH"""
         hm = HashMap(5)
         insertedPairs = {f"course{i}": f"prereq{i}" for i in range(6)}
         for key, value in insertedPairs.items():
@@ -94,52 +93,187 @@ class TestHashMapRehashing(unittest.TestCase):
             self.assertEqual(hm.get(key), expectedValue)
 
     def testCountIsCorrectAfterRehash(self):
-        """Verify that the internal count accurately reflects the number of unique keys after rehashing DH"""
+        """Internal count accurately reflects unique keys after rehashing DH"""
         hm = HashMap(5)
         for i in range(6):
             hm.put(f"k{i}", i)
         self.assertEqual(hm.count, 6)
 
     def testMultipleRehashesStillReturnCorrectValues(self):
-        """Verify that data integrity is maintained across multiple rehash cycles DH"""
+        """Data integrity maintained across multiple rehash cycles DH"""
         hm = HashMap(2)
         for i in range(20):
             hm.put(f"key{i}", i * 10)
         for i in range(20):
             self.assertEqual(hm.get(f"key{i}"), i * 10)
 
+
 class TestPrerequisiteEnrollment(unittest.TestCase):
     '''Verify that enrollment correctly enforces prerequisite rules DH'''
 
     def setUp(self):
-        '''Setup a course and a student for enrollment testing DH'''
-        self.c = Course("CSE2050", 3, 1) # Cap of 1
-        self.s = Student("STU01", "Test Student")
+        self.c = Course("CSE2050", 3, 5)
+        self.s = Student("Test Student", "STU00001")
 
     def testPrereqSuccess(self):
-        '''Ensure student can enroll if they have the prerequisite DH'''
+        '''Student with the prerequisite can enroll DH'''
         self.c.prerequisites.put("CSE2050", "CSE1010")
-        self.s.courses["CSE1010"] = "A" # Add to history
-        
+        self.s.courses["CSE1010"] = "A"
         self.c.request_enroll(self.s)
         self.assertEqual(len(self.c.enrolled_roster), 1)
 
     def testPrereqMissingRaisesException(self):
-        '''Ensure Exception is raised when student lacks prerequisite DH'''
+        '''Exception raised when student lacks prerequisite DH'''
         self.c.prerequisites.put("CSE2050", "CSE1010")
-        # Student history is empty
-        
         with self.assertRaises(Exception):
             self.c.request_enroll(self.s)
 
     def testPrereqMetButCourseFull(self):
-        '''Ensure student moves to waitlist if prereq is met but roster is full DH'''
-        self.c.maxStudents = 0 # Force waitlist
+        '''Student moves to waitlist if prereq is met but roster is full DH'''
+        self.c.maxStudents = 0
         self.c.prerequisites.put("CSE2050", "CSE1010")
         self.s.courses["CSE1010"] = "B"
-        
         self.c.request_enroll(self.s)
         self.assertEqual(len(self.c.waitlist), 1)
+
+    def testNoCourseNoPrereqSucceeds(self):
+        '''Course with no prerequisite allows enrollment DH'''
+        c = Course("CSE3666", 3, 5)  # No prereq stored
+        self.c.request_enroll(self.s)   # Should not raise
+
+    def testStudentEnrollRollbackOnFailedPrereq(self):
+        '''Student.enroll rolls back course entry when prereq check fails DH'''
+        self.c.prerequisites.put("CSE2050", "CSE1010")
+        with self.assertRaises(Exception):
+            self.s.enroll(self.c, "A")
+        # Course must NOT remain in student.courses after a failed enroll
+        self.assertNotIn(self.c, self.s.courses)
+
+    def testCourseObjectKeyPrereqCheck(self):
+        '''Prereq check works when prior course is stored as a Course object key DH'''
+        prereqCourse = Course("CSE1010", 3, 5)
+        # Enroll student in CSE1010 first (stores Course object as key)
+        prereqCourse.request_enroll(self.s)
+        self.s.courses[prereqCourse] = "A"
+        # Now enroll in CSE2050
+        self.c.prerequisites.put("CSE2050", "CSE1010")
+        self.c.request_enroll(self.s)
+        self.assertEqual(len(self.c.enrolled_roster), 1)
+
+
+class TestMergeSort(unittest.TestCase):
+    """Tests for the Merge Sort implementation DH"""
+
+    def setUp(self):
+        """Create a course and enroll four students in non-sorted order DH"""
+        self.c = Course("CSE2050", 3, 10)
+        data = [
+            ("STU00003", "Charlie", "2024-03-01"),
+            ("STU00001", "Alice",   "2024-01-01"),
+            ("STU00004", "Dave",    "2024-04-01"),
+            ("STU00002", "Bob",     "2024-02-01"),
+        ]
+        for sid, name, date in data:
+            self.c.request_enroll(Student(name, sid), date)
+
+    def testMergeSortById(self):
+        """Merge sort by ID produces ascending order DH"""
+        self.c.sort_enrolled('id', algorithm='merge')
+        ids = [r.student.id for r in self.c.enrolled_roster]
+        self.assertEqual(ids, sorted(ids))
+
+    def testMergeSortByName(self):
+        """Merge sort by name produces alphabetical order DH"""
+        self.c.sort_enrolled('name', algorithm='merge')
+        names = [r.student.name for r in self.c.enrolled_roster]
+        self.assertEqual(names, sorted(names))
+
+    def testMergeSortByDate(self):
+        """Merge sort by date produces chronological order DH"""
+        self.c.sort_enrolled('date', algorithm='merge')
+        dates = [r.enroll_date for r in self.c.enrolled_roster]
+        self.assertEqual(dates, sorted(dates))
+
+    def testMergeSortPreservesAllRecords(self):
+        """Merge sort does not drop or duplicate any enrollment records DH"""
+        before = {r.student.id for r in self.c.enrolled_roster}
+        self.c.sort_enrolled('id', algorithm='merge')
+        after = {r.student.id for r in self.c.enrolled_roster}
+        self.assertEqual(before, after)
+        self.assertEqual(len(self.c.enrolled_roster), 4)
+
+    def testMergeSortAlreadySorted(self):
+        """Merge sort on an already-sorted roster returns the same order DH"""
+        self.c.sort_enrolled('id', algorithm='merge')
+        first_pass = [r.student.id for r in self.c.enrolled_roster]
+        self.c.sort_enrolled('id', algorithm='merge')
+        second_pass = [r.student.id for r in self.c.enrolled_roster]
+        self.assertEqual(first_pass, second_pass)
+
+    def testMergeSortSingleElement(self):
+        """Merge sort on a one-element roster does not crash DH"""
+        c = Course("CSE1010", 3, 5)
+        c.request_enroll(Student("Only One", "STU00001"), "2024-01-01")
+        c.sort_enrolled('id', algorithm='merge')
+        self.assertEqual(len(c.enrolled_roster), 1)
+
+
+class TestQuickSort(unittest.TestCase):
+    """Tests for the Quick Sort implementation DH"""
+
+    def setUp(self):
+        """Create a course and enroll four students in non-sorted order DH"""
+        self.c = Course("CSE2050", 3, 10)
+        data = [
+            ("STU00003", "Charlie", "2024-03-01"),
+            ("STU00001", "Alice",   "2024-01-01"),
+            ("STU00004", "Dave",    "2024-04-01"),
+            ("STU00002", "Bob",     "2024-02-01"),
+        ]
+        for sid, name, date in data:
+            self.c.request_enroll(Student(name, sid), date)
+
+    def testQuickSortById(self):
+        """Quick sort by ID produces ascending order DH"""
+        self.c.sort_enrolled('id', algorithm='quick')
+        ids = [r.student.id for r in self.c.enrolled_roster]
+        self.assertEqual(ids, sorted(ids))
+
+    def testQuickSortByName(self):
+        """Quick sort by name produces alphabetical order DH"""
+        self.c.sort_enrolled('name', algorithm='quick')
+        names = [r.student.name for r in self.c.enrolled_roster]
+        self.assertEqual(names, sorted(names))
+
+    def testQuickSortByDate(self):
+        """Quick sort by date produces chronological order DH"""
+        self.c.sort_enrolled('date', algorithm='quick')
+        dates = [r.enroll_date for r in self.c.enrolled_roster]
+        self.assertEqual(dates, sorted(dates))
+
+    def testQuickSortPreservesAllRecords(self):
+        """Quick sort does not drop or duplicate any enrollment records DH"""
+        before = {r.student.id for r in self.c.enrolled_roster}
+        self.c.sort_enrolled('id', algorithm='quick')
+        after = {r.student.id for r in self.c.enrolled_roster}
+        self.assertEqual(before, after)
+        self.assertEqual(len(self.c.enrolled_roster), 4)
+
+    def testQuickSortAlreadySorted(self):
+        """Quick sort on an already-sorted roster returns the same order DH"""
+        self.c.sort_enrolled('id', algorithm='quick')
+        first_pass = [r.student.id for r in self.c.enrolled_roster]
+        self.c.sort_enrolled('id', algorithm='quick')
+        second_pass = [r.student.id for r in self.c.enrolled_roster]
+        self.assertEqual(first_pass, second_pass)
+
+    def testQuickSortSingleElement(self):
+        """Quick sort on a one-element roster does not crash DH"""
+        c = Course("CSE1010", 3, 5)
+        c.request_enroll(Student("Only One", "STU00001"), "2024-01-01")
+        c.sort_enrolled('id', algorithm='quick')
+        self.assertEqual(len(c.enrolled_roster), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

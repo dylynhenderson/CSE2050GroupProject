@@ -26,14 +26,17 @@ class Course:
 
         requiredPrereq = self.prerequisites.get(self.courseCode)
         if requiredPrereq:
-            if requiredPrereq not in student.courses:
-                raise Exception(f"Prerequisite {requiredPrereq} not met for {self.courseCode}")
+            completed = set()
+            for c in student.courses.keys():
+                completed.add(c if isinstance(c, str) else c.courseCode)
 
+            if requiredPrereq not in completed:
+                raise Exception(f"Prerequisite {requiredPrereq} not met for {self.courseCode}")
 
         for record in self.enrolled_roster:
             if record.student.id == student.id:
                 return
-
+ 
         if len(self.enrolled_roster) < self.maxStudents:
             record = EnrollmentRecord(student, enroll_date)
             self.enrolled_roster.append(record)
@@ -43,7 +46,7 @@ class Course:
             if student.id not in self._waitlisted_ids:
                 self.waitlist.enqueue(student)
                 self._waitlisted_ids.add(student.id)
-
+                
     def drop(self, student_id, enroll_date_for_replacement=None):
         '''Remove a student from the roster by ID and promote the next waitlisted student if any.
         
