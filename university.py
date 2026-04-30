@@ -1,5 +1,4 @@
 from fileinput import filename
-
 from course import Course
 from student import Student
 from structures import EnrollmentRecord, HashMap
@@ -11,10 +10,10 @@ class University:
         self.students = {}
         self.courses = {}
             
-    def addCourse(self, code, creds):
+    def addCourse(self, code, creds, capacity=0):
         '''Add a course to the university DH'''
         if code not in self.courses:
-            self.courses[code] = Course(code, creds)
+            self.courses[code] = Course(code, creds, capacity)
         return self.courses[code]
         
     def addStudent(self, student_id, name):
@@ -45,10 +44,10 @@ class University:
         return 0
     
     def getStudentsInCourse(self, code):
-        '''Return a list of student IDs enrolled in a course SM'''
+        '''Return a list of student IDs enrolled in a course SM and DH'''
         course = self.getCourse(code)
         if course:
-            return list(EnrollmentRecord.makeList())
+            return [record.student for record in course.enrolled_roster]
         return []
     
     def getAllGPAs(self):
@@ -89,8 +88,9 @@ class University:
         '''Return a list of student IDs enrolled in both courses DH'''
         s1 = set(s.id for s in self.getStudentsInCourse(code1))
         s2 = set(s.id for s in self.getStudentsInCourse(code2))
-        return [self.students[id] for id in s1 & s2]
-    
+        common_ids = s1 & s2
+        return [self.students[sid] for sid in common_ids]
+
     def search_by_id(self, idList, targetID, left, right):
         """Recursive Binary Search to find an ID in a list SM"""
         if left > right:
@@ -98,49 +98,34 @@ class University:
     
         mid = (left + right) // 2
     
-        # If target is found
         if idList[mid] == targetID:
             return mid
-    
-        # Search left half
         elif targetID < idList[mid]:
             return self.search_by_id(idList, targetID, left, mid - 1)
-    
-        # Search right half
         else:
             return self.search_by_id(idList, targetID, mid + 1, right)
     
     
-    
 def loadUniversity(enrollmentFile, catalogFile, prereqFile):
     '''Load students, course catalog, and prerequisites into the University system DH'''
-    from university import University
-    from student import Student
-    from course import Course
-    from structures import EnrollmentRecord
-    
     uni = University()
 
-    # Load Course Catalog
     with open(catalogFile, 'r') as file:
         lines = file.readlines()
         for line in lines[1:]:
             parts = line.strip().split(',')
             if len(parts) >= 5:
-                c = Course(parts[0], int(parts[2]), int(parts[4]))
-                uni.courses[parts[0]] = c
+                uni.addCourse(parts[0], int(parts[2]), int(parts[4]))
 
-    # Load Prerequisites
     with open(prereqFile, 'r') as file:
         lines = file.readlines()
         for line in lines[1:]:
-            parts = line.strip().split('\t')
+            parts = line.strip().split(',')
             if len(parts) >= 2:
                 courseId, prereqId = parts[0], parts[1]
                 if courseId in uni.courses and prereqId:
                     uni.courses[courseId].prerequisites.put(courseId, prereqId)
 
-    # Load Student History
     with open(enrollmentFile, 'r') as file:
         lines = file.readlines()
         for line in lines[1:]:
@@ -148,10 +133,16 @@ def loadUniversity(enrollmentFile, catalogFile, prereqFile):
             if len(parts) >= 4:
                 sId, cId, grade = parts[0], parts[1], parts[3]
                 if sId not in uni.students:
-                    uni.students[sId] = Student(sId, "Unknown Name")
-                uni.students[sId].courses[cId] = grade
+                    uni.addStudent(sId, "Unknown Name")
+                
+                student = uni.students[sId]
+                student.courses[cId] = grade
+                
                 if cId in uni.courses:
-                    uni.courses[cId].enrolled_roster.append(EnrollmentRecord(uni.students[sId], "2024-01-01"))
+                    try:
+                        uni.courses[cId].request_enroll(student, "2024-01-01")
+                    except Exception:
+                        pass
 
     return uni
    

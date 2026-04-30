@@ -135,6 +135,4 @@ class HashMap:
 
         for bucket in oldBuckets:
             for key, value in bucket:
-                idx = self._hash(key)
-                self.buckets[idx].append([key, value])
-                self.count += 1
+                self.put(key, value)

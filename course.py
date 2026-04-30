@@ -85,14 +85,62 @@ class Course:
             self.current_sort_key = None
 
     def sort_enrolled(self, by='id', algorithm='selection'):
-        '''Sort the enrolled roster by the given key using the chosen algorithm. DH'''
+        '''Sort the enrolled roster by the given key using the chosen algorithm. Updated for MS3 DH'''
         if algorithm == 'selection':
             self._selection_sort(by)
         elif algorithm == 'insertion':
             self._insertion_sort(by)
+        elif algorithm == 'merge':
+            self.enrolled_roster = self._merge_sort(self.enrolled_roster, by)
+        elif algorithm == 'quick':
+            self._quick_sort(self.enrolled_roster, 0, len(self.enrolled_roster) - 1, by)
         else:
-            raise ValueError(f"Unknown algorithm: {algorithm}. Use 'selection' or 'insertion'.")
+            raise ValueError(f"Unknown algorithm: {algorithm}. Use 'merge', 'quick', 'selection', or 'insertion'.")
         self.current_sort_key = by
+
+    def _merge_sort(self, roster, by):
+        '''Recursive Merge Sort implementation for Milestone 3 DH'''
+        if len(roster) <= 1:
+            return roster
+
+        mid = len(roster) // 2
+        left = self._merge_sort(roster[:mid], by)
+        right = self._merge_sort(roster[mid:], by)
+
+        return self._merge(left, right, by)
+
+    def _merge(self, left, right, by):
+        '''Helper to merge two lists for Merge Sort DH'''
+        result = []
+        i = j = 0
+        while i < len(left) and j < len(right):
+            if self._get_val(left[i], by) <= self._get_val(right[j], by):
+                result.append(left[i])
+                i += 1
+            else:
+                result.append(right[j])
+                j += 1
+        result.extend(left[i:])
+        result.extend(right[j:])
+        return result
+
+    def _quick_sort(self, roster, low, high, by):
+        '''Recursive Quick Sort implementation for Milestone 3 DH'''
+        if low < high:
+            p = self._partition(roster, low, high, by)
+            self._quick_sort(roster, low, p - 1, by)
+            self._quick_sort(roster, p + 1, high, by)
+
+    def _partition(self, roster, low, high, by):
+        '''Partition helper for Quick Sort using high element as pivot DH'''
+        pivot = self._get_val(roster[high], by)
+        i = low - 1
+        for j in range(low, high):
+            if self._get_val(roster[j], by) <= pivot:
+                i += 1
+                roster[i], roster[j] = roster[j], roster[i]
+        roster[i + 1], roster[high] = roster[high], roster[i + 1]
+        return i + 1
 
     def _selection_sort(self, by):
         '''Sort enrolled_roster in-place using Selection Sort DH'''
